@@ -18,7 +18,7 @@ Data binding and event binding extension for nunjucks
 
 ####Event Binding
 
-    <pre> <button {% bind "click saveProduct" %} > Save </button> </pre>
+   <button {% bind "click saveProduct" %} > Save </button>
     
 
 ###Check examples directory to see implementation.
