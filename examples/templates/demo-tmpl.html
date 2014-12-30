@@ -1,0 +1,15 @@
+{% block left %}
+	{{ product.name }} - {{ product.desc }}
+{% endblock %}
+
+<div>
+	<input type="text" {% input "id=productName value=product.name" %} />
+</div>
+
+<div>
+	{% textarea "id=productDesc, value=product.desc, cols=20, rows=5" %}
+</div>
+
+<div>
+	<button {% bind "click saveProduct" %} > Save </button>
+</div>
