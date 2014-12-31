@@ -8,8 +8,6 @@ Automatic event unbinding
 Two-way binding
 
 
-Data binding and event binding extension for nunjucks
-
 ####Binding an input field
     <input type="text" {% input "id=productName value=product.name" %} />
 
