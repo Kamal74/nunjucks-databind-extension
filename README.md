@@ -2,6 +2,8 @@ nunjucks-databind-extension ( WIP )
 ===========================
 This extension provides one-way binding ( view to model ) and event handling.
 
+######Checkout "src" dir for the code.
+
 #####Future work
 Event handling through delegation
 Automatic event unbinding
