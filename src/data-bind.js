@@ -5,8 +5,32 @@ function DataBindExt(models, ebinds, context) {
         var dbinds = {};
 
         function eventDelegate(e) {
-            var x = dbinds[ e.target.id ].prop.split('.');
-            models[ x[0] ][ x[1] ] = e.target.value;
+            var target    = e.target,
+                dbindArr  = dbinds[ e.target.id ].prop.split('.'),
+                dbindLen  = dbindArr.length,
+                fieldVal  = null,
+                modelTmp  = null;
+            models || ( models = {} );
+            modelTmp = models;
+            dbindArr.forEach(function (val, index) {  
+                if (!(modelTmp[ val ] && Object.prototype.toString.call(modelTmp[ val ]) === '[object Object]')) {
+                    if (index !== dbindLen - 1) {
+                        modelTmp[ val ] = {}; // Create a new obj here
+
+                    } else {
+                        // This is a property, set the value
+                        (target.type === 'checkbox') ? (fieldVal = target.checked) : (fieldVal = target.value);
+                        if (typeof fieldVal === 'string') {
+                            fieldVal = fieldVal.trim();
+                        }
+                        
+                        modelTmp[ val ] = fieldVal; // Set the value of the property
+                    
+                    }
+                }
+                modelTmp = modelTmp[ val ];
+            });
+
         }
 
         // Delegate change events
@@ -26,15 +50,21 @@ function DataBindExt(models, ebinds, context) {
         };
 
         this.bindInput = function(context, args, body, errorBody) {
-            var id = /id=(\w*)/.exec( args )[1],
-                objProp = /value=(\w*\.\w*)/.exec( args )[1],
-                val = objProp.split('.'),
-                ret = new nunjucks.runtime.SafeString('id="' + id + '" value="' + context.ctx[ val[0] ][ val[1] ] + '"');
+            var id            = /id=(\w*)/.exec( args )[1],
+                objProp       = /value=([\w+\.]*)/.exec( args )[1],
+                objPropArr    = objProp.split( '.' ),
+                objPropArrLen = objPropArr.length,
+                modelTmp      = context.ctx;
+
+            objPropArr.forEach(function (val, index) {  
+                modelTmp = modelTmp[ val ];
+            });
+
             dbinds[ id ] = {
                 ele: '#' + id,
                 prop: objProp
             };
-            return ret;
+            return new nunjucks.runtime.SafeString('id="' + id + '" value="' + modelTmp + '"');;
 
         };
 
