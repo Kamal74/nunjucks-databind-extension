@@ -1,4 +1,3 @@
-// Data bind extension starts here
 function DataBindExt(models, ebinds, context) {
     'use strict';
         this.tags = ['input', 'textarea', 'bind'];
@@ -33,7 +32,7 @@ function DataBindExt(models, ebinds, context) {
 
         }
 
-        // Delegate change events
+        // For Delegating change events
         document.addEventListener('change', eventDelegate);
 
         this.parse = function(parser, nodes, lexer) {
@@ -69,31 +68,35 @@ function DataBindExt(models, ebinds, context) {
         };
 
         this.bindTextarea = function(context, args, body, errorBody) {
-            var id = /id=(\w*)/.exec(args)[1],
-                objProp = /value=(\w*\.\w*)/.exec(args)[1],
-                cols = /cols=(\w*)/.exec(args)[1],
-                rows = /rows=(\w*)/.exec(args)[1],
-                val = objProp.split('.'),
-                ret = new nunjucks.runtime.SafeString( '<textarea id="' + id + '" cols="' + cols + '" rows="' + rows + '">' + models[ val[0] ][ val[1] ] + '</textarea>' );
+            var id            = /id=(\w*)/.exec(args)[1],
+                objProp       = /value=([\w+\.]*)/.exec( args )[1],
+                objPropArr    = objProp.split( '.' ),
+                objPropArrLen = objPropArr.length,
+                modelTmp      = context.ctx,
+                cols          = /cols=(\w*)/.exec(args)[1],
+                rows          = /rows=(\w*)/.exec(args)[1];
+
+            objPropArr.forEach(function (val, index) {  
+                modelTmp = modelTmp[ val ];
+            });
 
             dbinds[id] = {
                 ele  : '#' + id,
                 prop : objProp
             };
-            return ret;
+
+            return new nunjucks.runtime.SafeString( '<textarea id="' + id + '" cols="' + cols + '" rows="' + rows + '">' + modelTmp + '</textarea>' );
         };
 
         this.bindEvents = function(context, args, body, errorBody) {
             var x = args.split(' '),
-                id = x[1] + Math.floor(Math.random() * 1000),
-                ret = new nunjucks.runtime.SafeString('id="' + id + '"');
+                id = x[1] + Math.floor(Math.random() * 1000);
             ebinds.push({
                 'event': x[0],
                 'fn'   : x[1],
                 'id'   : id
             });
 
-            return ret;
+            return new nunjucks.runtime.SafeString('id="' + id + '"');
         }
-    }
-    // Data bind extension ends here
+}
